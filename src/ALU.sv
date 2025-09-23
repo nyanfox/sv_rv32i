@@ -17,10 +17,19 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  localparam SRL = 4'b1000;
  localparam SRA = 4'b1001;
  
+ wire ins_cla_o_cout;
+ wire [31:0] ins_cla_o_sum;
+ 
  assign o_alu_data = o_alu_data_r;
+ 
+ CLA32bit ins_cla (.i_a(i_op_a), .i_b(i_op_b), .i_cin(0), .o_sum(ins_cla_o_sum), .o_cout(ins_cla_o_cout));
  
  always @(*) begin
   case (i_alu_op)
+   ADD: begin
+	    o_alu_data_r <= ins_cla_o_sum;
+	end
+  
    AND: begin
 	    o_alu_data_r <= i_op_a & i_op_b;
 	end
