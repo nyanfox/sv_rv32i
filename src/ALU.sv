@@ -17,6 +17,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  localparam SRL = 4'b1000;
  localparam SRA = 4'b1001;
  
+ wire ins_compa_sign_o_lt;
  wire ins_compa_unsign_o_gt, ins_compa_unsign_o_eq, ins_compa_unsign_o_lt; 
  wire ins_cla_o_cout, ins_sub_o_cout;
  wire [31:0] ins_cla_o_sum, ins_sub_o_sum;
@@ -26,6 +27,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  CLA32bit ins_cla (.i_a(i_op_a), .i_b(i_op_b), .i_cin(0), .o_sum(ins_cla_o_sum), .o_cout(ins_cla_o_cout));
  SUB32bit ins_sub (.i_a(i_op_a), .i_b(i_op_b), .i_cin(0), .o_sum(ins_sub_o_sum), .o_cout(ins_sub_o_cout));
  Compa32bitUnsign ins_compa_unsign (.i_a(i_op_a), .i_b(i_op_b), .o_gt(ins_compa_unsign_o_gt), .o_eq(ins_compa_unsign_o_eq), .o_lt(ins_compa_unsign_o_lt));
+ Compa32bitSign ins_compa_sign (.i_a(i_op_a), .i_b(i_op_b), .o_lt(ins_compa_sign_o_lt));
  
  always @(*) begin
   case (i_alu_op)
@@ -39,6 +41,10 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
 	
 	SLT:begin
 	    o_alu_data_r <= ins_compa_unsign_o_lt;
+	end
+	
+	SLTU: begin
+	    o_alu_data_r <= ins_compa_sign_o_lt;
 	end
 	
 	XOR: begin
