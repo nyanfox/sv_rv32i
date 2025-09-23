@@ -67,7 +67,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
 	    o_alu_data_r <= ins_shift_left_o_data;
 	end
 	
-	SLT:begin
+	SRL:begin
 	    o_alu_data_r <= ins_shift_right_o_data;
 	end
  
