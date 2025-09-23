@@ -23,6 +23,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  wire [31:0] ins_cla_o_sum, ins_sub_o_sum;
  wire [31:0] ins_shift_left_o_data;
  wire [31:0] ins_shift_right_o_data;
+ wire [31:0] ins_shift_right_anri_o_data;
  
  assign o_alu_data = o_alu_data_r;
  
@@ -32,6 +33,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  Compa32bitSign ins_compa_sign (.i_a(i_op_a), .i_b(i_op_b), .o_lt(ins_compa_sign_o_lt));
  ShiftLeftLogical ins_shift_left_logical (.i_a(i_op_a), .i_b(i_op_b[4:0]), .o_data(ins_shift_left_o_data));
  ShiftRightLogical ins_shift_right_logical (.i_a(i_op_a), .i_b(i_op_b[4:0]), .o_data(ins_shift_right_o_data));
+ ShiftRightAnri ins_shift_right_anri (.i_a(i_op_a), .i_b(i_op_b[4:0]), .o_data(ins_shift_right_anri_o_data));
  
  always @(*) begin
   case (i_alu_op)
@@ -71,6 +73,13 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
 	    o_alu_data_r <= ins_shift_right_o_data;
 	end
  
+   SRA:begin
+	    o_alu_data_r <= ins_shift_right_anri_o_data;
+	end
+	
+	default:begin
+	    o_alu_data_r <= 0;
+	end
   endcase
  end
 
