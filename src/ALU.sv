@@ -21,6 +21,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  wire ins_compa_unsign_o_gt, ins_compa_unsign_o_eq, ins_compa_unsign_o_lt; 
  wire ins_cla_o_cout, ins_sub_o_cout;
  wire [31:0] ins_cla_o_sum, ins_sub_o_sum;
+ wire [31:0] ins_shift_left_o_datal;
  
  assign o_alu_data = o_alu_data_r;
  
@@ -28,6 +29,7 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
  SUB32bit ins_sub (.i_a(i_op_a), .i_b(i_op_b), .i_cin(0), .o_sum(ins_sub_o_sum), .o_cout(ins_sub_o_cout));
  Compa32bitUnsign ins_compa_unsign (.i_a(i_op_a), .i_b(i_op_b), .o_gt(ins_compa_unsign_o_gt), .o_eq(ins_compa_unsign_o_eq), .o_lt(ins_compa_unsign_o_lt));
  Compa32bitSign ins_compa_sign (.i_a(i_op_a), .i_b(i_op_b), .o_lt(ins_compa_sign_o_lt));
+ ShiftLeftLogical ins_shift_left_logical (.i_a(i_op_a), .i_b(i_op_b[4:0]), .o_data(ins_shift_left_o_data));
  
  always @(*) begin
   case (i_alu_op)
@@ -58,7 +60,10 @@ module ALU (i_op_a, i_op_b, i_alu_op, o_alu_data);
    AND: begin
 	    o_alu_data_r <= i_op_a & i_op_b;
 	end
- 
+   
+	SLL: begin
+	    o_alu_data_r <= ins_shift_left_o_data;
+	end
  
   endcase
  end
