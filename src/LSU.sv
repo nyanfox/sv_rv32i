@@ -47,8 +47,11 @@ module LSU (i_clk, i_reset, i_funct3, i_lsu_addr, i_st_data, i_lsu_wren, o_ld_da
   if(i_lsu_addr[31:16]==16'h0000) begin
       o_ld_data = ins_loadunit_o_data;
   end
-  if(i_lsu_addr[31:16]==16'h1001) begin
-     o_ld_data = i_io_sw;
+  else if(i_lsu_addr[31:16]==16'h1001) begin
+      o_ld_data = i_io_sw;
+  end
+  else begin
+      o_ld_data = 32'h0000_0000;    
   end
  end
  
