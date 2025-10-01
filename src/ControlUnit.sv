@@ -41,6 +41,8 @@ module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un
  localparam ORI = 3'b110;
  localparam ANDI = 3'b111;
  
+ localparam SLLI = 3'b001;
+ localparam SRLI_SRAI = 3'b101;
  
  assign opcode = i_instr[6:0];
  assign funct3 = i_instr[14:12];
@@ -49,178 +51,90 @@ module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un
  always @(*) begin
   case(opcode)
    R_TYPE:begin
-	 case (funct7)
-	  ADD_SUB: begin
-	   if(funct7[5]==1'b0) begin
-		    o_pc_sel = 4'b0000;
-			 o_opa_sel = 1'b0;
-			 o_opb_sel = 1'b0;
-			 o_wb_sel = 2'b01;
-			 o_rd_wren = 1'b0;
-			 o_mem_wren = 1'b0;
-			 o_pc_sel = 1'b0;
-		end
-	   else begin
-	       o_pc_sel = 4'b0001;
-			 o_opa_sel = 1'b0;
-			 o_opb_sel = 1'b0;
-			 o_wb_sel = 2'b01;
-			 o_rd_wren = 1'b0;
-			 o_mem_wren = 1'b0;
-			 o_pc_sel = 1'b0;
-	   end
-	  end
-	  
-	  SLL: begin
-	      o_pc_sel = 4'b0111;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b0;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  SLT: begin
-	      o_pc_sel = 4'b0110;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b0;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  SLTU: begin
-	      o_pc_sel = 4'b0011;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b0;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  XOR: begin
-	      o_pc_sel = 4'b0100;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b0;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  SRL_SRA: begin
-	   if(funct7[5]==1'b0) begin
-		    o_pc_sel = 4'b1000;
-			 o_opa_sel = 1'b0;
-			 o_opb_sel = 1'b0;
-			 o_wb_sel = 2'b01;
-			 o_rd_wren = 1'b0;
-			 o_mem_wren = 1'b0;
-			 o_pc_sel = 1'b0;
-		end
-	   else begin
-	       o_pc_sel = 4'b1001;
-			 o_opa_sel = 1'b0;
-			 o_opb_sel = 1'b0;
-			 o_wb_sel = 2'b01;
-			 o_rd_wren = 1'b0;
-			 o_mem_wren = 1'b0;
-			 o_pc_sel = 1'b0;
-	   end
-	  end
-	  
-	  OR: begin
-	      o_pc_sel = 4'b0101;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b0;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  AND: begin
-	      o_pc_sel = 4'b0110;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b0;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	 endcase
-	end
+       o_opa_sel = 1'b0;
+       o_opb_sel = 1'b0;
+       o_wb_sel = 2'b01;
+       o_rd_wren = 1'b0;
+       o_mem_wren = 1'b0;
+       o_pc_sel = 1'b0;
+       case (funct7)
+        ADD_SUB: begin
+         if(funct7[5]==1'b0) begin
+             o_alu_op = 4'b0000;
+         end
+         else begin
+             o_alu_op = 4'b0001;
+         end
+        end
+        SLL: begin
+            o_alu_op = 4'b0111;
+        end
+        SLT: begin
+            o_alu_op = 4'b0110;
+        end
+        SLTU: begin
+            o_alu_op = 4'b0011;
+        end
+        XOR: begin
+            o_alu_op = 4'b0100;
+        end
+        SRL_SRA: begin
+         if(funct7[5]==1'b0) begin
+             o_alu_op = 4'b1000;
+         end
+         else begin
+             o_alu_op = 4'b1001;
+         end
+        end
+        OR: begin
+            o_alu_op = 4'b0101;
+        end
+        AND: begin
+            o_alu_op = 4'b0110;
+        end
+       endcase
+      end
 	
 	I_TYPE_1:begin
-	 case (funct3) 
-	  ADDI:begin
-	      o_pc_sel = 4'b0000;
-			o_opa_sel = 1'b0;
-		   o_opb_sel = 1'b1;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  SLTI:begin
-	      o_pc_sel = 4'b0110;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b1;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  SLTIU:begin
-	      o_pc_sel = 4'b0110;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b1;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  XORI: begin
-	      o_pc_sel = 4'b0100;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b1;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  ORI: begin
-	      o_pc_sel = 4'b0101;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b1;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	  
-	  ANDI: begin
-	      o_pc_sel = 4'b0110;
-			o_opa_sel = 1'b0;
-			o_opb_sel = 1'b1;
-			o_wb_sel = 2'b01;
-			o_rd_wren = 1'b0;
-			o_mem_wren = 1'b0;
-			o_pc_sel = 1'b0;
-	  end
-	 
-	 endcase
-	end
-  
-  endcase
- 
+       o_opa_sel = 1'b0;
+		 o_opb_sel = 1'b1;
+       o_wb_sel = 2'b01;
+       o_rd_wren = 1'b0;
+       o_mem_wren = 1'b0;
+       o_pc_sel = 1'b0; 
+	    case (funct3)
+	     ADDI:begin
+            o_alu_op = 4'b0000;
+        end
+        SLTI:begin
+            o_alu_op = 4'b0110;
+        end
+        SLTIU:begin
+            o_alu_op = 4'b0110;
+        end
+        XORI: begin
+            o_alu_op = 4'b0100;
+        end
+        ORI: begin
+            o_alu_op = 4'b0101;
+        end
+        ANDI: begin
+            o_alu_op = 4'b0110;
+        end
+        SLLI: begin
+            o_alu_op = 4'b0111;
+        end
+        SRLI_SRAI: begin
+         if(funct7[5]==1'b0) begin
+             o_alu_op = 4'b1000;
+         end
+         else begin
+             o_alu_op = 4'b1001;
+         end
+        end
+       endcase
+      end
+     endcase
  end
  
  endmodule
