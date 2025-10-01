@@ -13,9 +13,6 @@ module LoadUnit (i_data1, i_data2, i_funct3, i_lsu_addr, o_data);
  localparam LBU = 3'b100;
  localparam LHU = 3'b101;
  
- localparam SB = 3'b000;
- localparam SH = 3'b001;
- localparam SW = 3'b010;
  
  assign o_data = o_data_r;
  
@@ -123,5 +120,7 @@ module LoadUnit (i_data1, i_data2, i_funct3, i_lsu_addr, o_data);
    end
    endcase
  end
+
+ 
 
 endmodule
