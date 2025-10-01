@@ -47,7 +47,7 @@ module LoadUnit (i_data1, i_data2, i_funct3, i_lsu_addr, o_data);
 			o_data_r[31:16] = i_data1[23];
 	  end
 	  else if(i_lsu_addr[1:0] == 2'b10) begin
-	      o_data_r[15:0] = i_data1[31:15];
+	      o_data_r[15:0] = i_data1[31:16];
 			o_data_r[31:16] = i_data1[31];
 	  end
 	  else begin
@@ -104,7 +104,7 @@ module LoadUnit (i_data1, i_data2, i_funct3, i_lsu_addr, o_data);
 			o_data_r[31:16] = 0;
 	  end
 	  else if(i_lsu_addr[1:0] == 2'b10) begin
-	      o_data_r[15:0] = i_data1[31:15];
+	      o_data_r[15:0] = i_data1[31:16];
 			o_data_r[31:16] = 0;
 	  end
 	  else begin

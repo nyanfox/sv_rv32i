@@ -12,8 +12,8 @@ module brc (i_rs1_data, i_rs2_data, i_br_un, o_br_less, o_br_equal);
  assign o_br_less = o_br_less_r;
  assign o_br_equal = o_br_equal_r;
  
- Compa32bitSign ins_compa_sign (.i_a(i_a), .i_b(i_b), .o_lt(compa_sign_lt), .o_eq(compa_sign_eq));
- Compa32bitUnsign ins_compa_unsign (.i_a(i_a), .i_b(i_b), .o_gt(compa_unsign_gt), .o_eq(compa_unsign_eq), .o_lt(compa_unsign_lt));
+ Compa32bitSign ins_compa_sign (.i_a(i_rs1_data), .i_b(i_rs2_data), .o_lt(compa_sign_lt), .o_eq(compa_sign_eq));
+ Compa32bitUnsign ins_compa_unsign (.i_a(i_rs1_data), .i_b(i_rs2_data), .o_gt(compa_unsign_gt), .o_eq(compa_unsign_eq), .o_lt(compa_unsign_lt));
  
  always @(*) begin
   if(i_br_un == 1) begin
