@@ -1,16 +1,16 @@
 module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un, o_opa_sel, o_opb_sel, 
-                     o_alu_op, o_mem_wren, o_wb_sel, o_insn_vld);
+                     o_alu_op, o_mem_wren, o_wb_sel, o_insn_vld, o_lsu_funct3);
 
  input [31:0] i_instr;
  input i_br_less, i_br_equal;
-
  output o_pc_sel, o_rd_wren, o_insn_vld, o_br_un, o_mem_wren;
  output o_opa_sel, o_opb_sel;
+ output [2:0] o_lsu_funct3;
  output [3:0] o_alu_op;
  output [1:0] o_wb_sel;
  
  
-    // Giải mã i_instruction
+ // Giải mã i_instruction
  wire [6:0] opcode;
  wire [2:0] funct3;
  wire [6:0] funct7;
@@ -44,6 +44,23 @@ module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un
  localparam SLLI = 3'b001;
  localparam SRLI_SRAI = 3'b101;
  
+ localparam LB = 3'b000;
+ localparam LH = 3'b001;
+ localparam LW = 3'b010;
+ localparam LBU= 3'b100;
+ localparam LHU = 3'b101;
+ 
+ localparam SB = 3'b000;
+ localparam SH = 3'b001;
+ localparam SW = 3'b010;
+ 
+ localparam BEQ = 3'b000;
+ localparam BNE = 3'b001;
+ localparam BLT = 3'b100;
+ localparam BGE = 3'b101;
+ localparam BLTU = 3'b110;
+ localparam BGEU = 3'b111;
+ 
  assign opcode = i_instr[6:0];
  assign funct3 = i_instr[14:12];
  assign funct7 = i_instr[31:25];
@@ -52,9 +69,9 @@ module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un
   case(opcode)
    R_TYPE:begin
        o_opa_sel = 1'b0;
-       o_opb_sel = 1'b0;
+       o_opb_sel = 1'b1;
        o_wb_sel = 2'b01;
-       o_rd_wren = 1'b0;
+       o_rd_wren = 1'b1;
        o_mem_wren = 1'b0;
        o_pc_sel = 1'b0;
        case (funct7)
@@ -95,11 +112,11 @@ module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un
        endcase
       end
 	
-	I_TYPE_1:begin
+   I_TYPE_1:begin
        o_opa_sel = 1'b0;
-		 o_opb_sel = 1'b1;
+		 o_opb_sel = 1'b0;
        o_wb_sel = 2'b01;
-       o_rd_wren = 1'b0;
+       o_rd_wren = 1'b1;
        o_mem_wren = 1'b0;
        o_pc_sel = 1'b0; 
 	    case (funct3)
@@ -134,7 +151,134 @@ module ControlUnit (i_instr, i_br_less, i_br_equal, o_pc_sel, o_rd_wren, o_br_un
         end
        endcase
       end
-     endcase
+		
+	I_TYPE_2: begin
+       o_opa_sel = 1'b1;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b10;
+       o_rd_wren = 1'b1;
+       o_mem_wren = 1'b0;
+       o_pc_sel = 1'b1;
+		 o_alu_op = 4'b0000;
+   end	
+		
+   I_TYPE_3: begin
+	    o_opa_sel = 1'b0;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b00;
+       o_rd_wren = 1'b1;
+       o_mem_wren = 1'b0;
+       o_pc_sel = 1'b0;
+		 o_alu_op = 4'b0000;
+		 o_lsu_funct3 = funct3;
+		 
+   end
+
+   S_TYPE: begin
+       o_opa_sel = 1'b0;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b00;
+       o_rd_wren = 1'b0;
+       o_mem_wren = 1'b1;
+       o_pc_sel = 1'b0;
+		 o_alu_op = 4'b0000;
+		 o_lsu_funct3 = funct3;
+   end
+
+  B_TYPE: begin
+       o_opa_sel = 1'b1;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b00;
+       o_rd_wren = 1'b0;
+       o_mem_wren = 1'b0;
+		 o_alu_op = 4'b0000;
+   case(funct3)
+	 BEQ:begin
+		 o_br_un = 1'b1;
+		 if(i_br_equal==1'b1) begin
+		     o_pc_sel=1'b1;
+		 end
+		 else begin
+		     o_pc_sel=1'b0;
+		 end
+	 end
+	 BNE:begin
+	     o_br_un = 1'b1;
+		 if(i_br_equal==1'b0) begin
+		     o_pc_sel=1'b1;
+		 end
+		 else begin
+		     o_pc_sel=1'b0;
+		 end
+	 end
+	 BLT:begin
+	     o_br_un = 1'b1;
+		 if(i_br_less==1'b1) begin
+		     o_pc_sel=1'b1;
+		 end
+		 else begin
+		     o_pc_sel=1'b0;
+		 end
+	 end
+	 BGE:begin
+	     o_br_un = 1'b1;
+		 if(i_br_less==1'b0) begin
+		     o_pc_sel=1'b1;
+		 end
+		 else begin
+		     o_pc_sel=1'b0;
+		 end
+	 end
+	  BLTU:begin
+	     o_br_un = 1'b0;
+		 if(i_br_less==1'b1) begin
+		     o_pc_sel=1'b1;
+		 end
+		 else begin
+		     o_pc_sel=1'b0;
+		 end
+	 end
+	  BGEU:begin
+	     o_br_un = 1'b0;
+		 if(i_br_less==1'b0) begin
+		     o_pc_sel=1'b1;
+		 end
+		 else begin
+		     o_pc_sel=1'b0;
+		 end
+	 end
+	endcase
+  end
+ 
+  U_TYPE_1:begin
+       o_opa_sel = 1'b1;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b11;
+       o_rd_wren = 1'b1;
+       o_mem_wren = 1'b0;
+		 o_alu_op = 4'b0000;
+  end
+  
+  U_TYPE_2:begin
+       o_opa_sel = 1'b1;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b01;
+       o_rd_wren = 1'b1;
+       o_mem_wren = 1'b0;
+		 o_alu_op = 4'b0000;
+  end
+  
+  J_TYPE:begin
+       o_opa_sel = 1'b1;
+		 o_opb_sel = 1'b0;
+       o_wb_sel = 2'b10;
+       o_rd_wren = 1'b1;
+       o_mem_wren = 1'b0;
+		 o_alu_op = 4'b0000;
+  end
+  
+  endcase
+	 
  end
  
  endmodule
